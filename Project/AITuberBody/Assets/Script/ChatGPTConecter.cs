@@ -85,7 +85,6 @@ public class ChatGPTConecter : MonoBehaviour
             while(!sr.EndOfStream)
             {
                 var line = sr.ReadLine();
-                Debug.Log(line);
                 var split = line.Split(" ");
                 if (split.Length==2)
                 {
@@ -93,6 +92,7 @@ public class ChatGPTConecter : MonoBehaviour
                     {
                         case "OpenAI-APIKey":
                             API_KEY = split[1];
+                            Debug.Log("Config : OpenAI-APIKey Setup");
                             break;
                         case "VOICEVOX":
                             {
@@ -116,6 +116,10 @@ public class ChatGPTConecter : MonoBehaviour
                                     proc.Start();
                                 }
                             }
+                            Debug.Log("Config : VOICEVOX Setup");
+                            break;
+                        default:
+                            Debug.Log(line);
                             break;
 
                     }
