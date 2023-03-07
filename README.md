@@ -1,6 +1,6 @@
 # 概要
  
-[top_image](Readme_Resource/test.png)
+![top_image](Readme_Resource/test.png)
  
 # 必要なもの
 
