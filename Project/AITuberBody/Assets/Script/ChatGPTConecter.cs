@@ -42,6 +42,7 @@ public class ChatGPTConecter : MonoBehaviour
     private TMPro.TextMeshProUGUI InfomationText;
 
     private VoiceConecter VoiceConecter;
+    private CommentConecter CommentConecter;
 
     class SpeakData
     {
@@ -68,11 +69,13 @@ public class ChatGPTConecter : MonoBehaviour
     object chatGPTDatasLock = new object();
     bool isChatGPTSending = false;
 
-
+    int stockUserMessageCount = 0;
 
     // Start is called before the first frame update
     void Start()
     {
+        CommentConecter = GetComponent<CommentConecter>();
+
         string API_KEY = "";
 
         // Data/config.txt ‚©‚çÝ’è‚ð“Ç‚Ýž‚Ý‚Ü‚·
@@ -279,6 +282,22 @@ public class ChatGPTConecter : MonoBehaviour
                 Debug.Log($"SpeakTest {sd.speak} {sd.pose}");
                 StartCoroutine( SpeakTest(sd.speak, sd.pose));
             }
+        }
+
+
+        lock (CommentConecter.CommentPacksLock)
+        {
+            foreach (var v in CommentConecter.CommentPacks)
+            {
+                AddContentCore("user", v.message);
+            }
+            stockUserMessageCount += CommentConecter.CommentPacks.Count;
+            CommentConecter.CommentPacks.Clear();
+        }
+
+        if (!isChatGPTSending && stockUserMessageCount > 0)
+        {
+            SendContent();
         }
 
         {
