@@ -2704,7 +2704,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1650947587}
         m_TargetAssemblyTypeName: ChatGPTConecter, Assembly-CSharp
-        m_MethodName: AddContent
+        m_MethodName: StartAI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
