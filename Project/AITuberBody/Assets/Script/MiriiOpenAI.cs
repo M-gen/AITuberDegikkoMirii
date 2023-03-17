@@ -60,8 +60,6 @@ namespace Mirii
         public ChatGPTClient(string apiKey)
         {
             _apiKey = apiKey;
-            //_messageList.Add(
-            //    new ChatGPTMessageModel() { role = "system", content = "語尾に「にゃ」をつけて" });
         }
 
         public void AddMessage( string role, string content )
@@ -69,12 +67,66 @@ namespace Mirii
             _messageList.Add(new ChatGPTMessageModel { role = role, content = content });
         }
 
+        // たまったコメントなどのデータを一部削除しクリンナップする処理
+        public void CleanupMessage( int assistantLeaveCount, int userLeaveCount)
+        {
+            var system = new List<ChatGPTMessageModel>();
+            var assystant = new List<ChatGPTMessageModel>();
+            var usercomment = new List<ChatGPTMessageModel>();
+            foreach( var v in _messageList)
+            {
+                if (v.role == "system")
+                {
+                    system.Add(v);
+                } else if (v.role == "assistant") {
+                    assystant.Add(v);
+                } else if (v.role == "user") {
+                    usercomment.Add(v);
+                }
+            }
+
+            if (assystant.Count > 0)
+            {
+                while (assystant.Count >= assistantLeaveCount )
+                {
+                    if (assystant.Count == 0) break;
+                    assystant.RemoveAt(0);
+                }
+            }
+
+            if (usercomment.Count > 0)
+            {
+                while (usercomment.Count >= userLeaveCount)
+                {
+                    if (usercomment.Count == 0) break;
+                    usercomment.RemoveAt(0);
+                }
+            }
+
+            _messageList.Clear();
+            Debug.Log($"CleanupMessage Stat {system.Count} {assystant.Count} {usercomment.Count}");
+            foreach ( var v in system)
+            {
+                _messageList.Add(v);
+                Debug.Log("system:"+v.content);
+            }
+            foreach (var v in assystant)
+            {
+                _messageList.Add(v);
+                Debug.Log("assystant:" + v.content);
+            }
+            foreach (var v in usercomment)
+            {
+                _messageList.Add(v);
+                Debug.Log("usercomment:" + v.content);
+            }
+            Debug.Log("CleanupMessage End");
+        }
+
         public async UniTask<ChatGPTResponseModel> RequestAsync()
         {
             //文章生成AIのAPIのエンドポイントを設定
             var apiUrl = "https://api.openai.com/v1/chat/completions";
-
-            //_messageList.Add(new ChatGPTMessageModel { role = "user", content = userMessage });
 
             //OpenAIのAPIリクエストに必要なヘッダー情報を設定
             var headers = new Dictionary<string, string>
@@ -91,8 +143,6 @@ namespace Mirii
                 messages = _messageList
             };
             var jsonOptions = JsonUtility.ToJson(options);
-
-            //Debug.Log("自分:" + userMessage);
 
             //OpenAIの文章生成(Completion)にAPIリクエストを送り、結果を変数に格納
             using var request = new UnityWebRequest(apiUrl, "POST")
